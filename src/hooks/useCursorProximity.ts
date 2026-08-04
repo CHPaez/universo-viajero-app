@@ -15,6 +15,7 @@ export function useCursorProximityGlow(
   const latest = useRef({ x: -9999, y: -9999 });
   const glowRef = useRef(glow);
   glowRef.current = glow;
+  const lastLog = useRef(0);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -35,6 +36,12 @@ export function useCursorProximityGlow(
         const { pulseAmt, boxShadow } = glowRef.current(closeness);
         el.style.setProperty('--pulse-amt', String(pulseAmt));
         el.style.boxShadow = boxShadow;
+        const now = performance.now();
+        if (closeness > 0.01 && now - lastLog.current > 300) {
+          lastLog.current = now;
+          // eslint-disable-next-line no-console
+          console.log('[PROXIMITY]', { dist: Math.round(dist), radius, closeness: closeness.toFixed(3) });
+        }
       }
       rafId = requestAnimationFrame(tick);
     });
