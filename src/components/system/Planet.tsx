@@ -80,7 +80,15 @@ export function Planet({ planet, flying, flightDuration, onDown }: PlanetProps) 
             <img
               src={data.src}
               draggable={false}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                WebkitTouchCallout: 'none',
+              }}
             />
           ) : (
             <div

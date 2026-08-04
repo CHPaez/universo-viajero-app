@@ -64,6 +64,10 @@ export function SystemScene({ interactive }: SystemSceneProps) {
         background: COLORS.bg,
         cursor: 'grab',
         pointerEvents: interactive ? 'auto' : 'none',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+        touchAction: 'none',
       }}
       onPointerDown={handleBgDown}
       onPointerMove={handlePointerMove}
