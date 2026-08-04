@@ -1,32 +1,45 @@
-# React + TypeScript + Vite
+# Universo Viajero — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Sitio interactivo tipo collage/scrapbook de [El Viajero Imaginario](https://www.instagram.com/el_viajero_imaginario/): un universo espacial navegable con soles, planetas y un reproductor de audio ambiental. Consume la API del [backend Laravel](https://github.com/CHPaez/universo-viajero-api).
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript
+- Vite
+- `motion` (Framer Motion)
 
-## React Compiler
+## Desarrollo local
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Requisitos: Node.js, y el [backend](https://github.com/CHPaez/universo-viajero-api) corriendo (por defecto se espera en `http://localhost:8000`).
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Si el backend corre en otra URL/puerto, ajustá `VITE_API_URL` en `.env`.
+
+Abre en `http://localhost:5173` (o el puerto que Vite elija si ese está ocupado).
+
+## Build de producción
+
+```bash
+npm run build
+```
+
+Genera un `dist/` estático — no necesita Node corriendo en el servidor, se sirve directo con Nginx (o cualquier hosting estático). Antes de buildear, apuntá `VITE_API_URL` en `.env` a la URL real de la API en producción.
+
+## Deploy a producción (Hetzner u otro VPS)
+
+1. En el mismo servidor donde está el backend (o en cualquier hosting estático):
+   ```bash
+   git clone https://github.com/CHPaez/universo-viajero-app.git
+   cd universo-viajero-app
+   npm install
+   echo "VITE_API_URL=https://tu-dominio-api-real" > .env
+   npm run build
+   ```
+2. Servir `dist/` con Nginx: `root` apuntando a esa carpeta, `try_files $uri /index.html` (es una SPA).
+3. En el backend, agregar el dominio/subdominio real de este frontend a `allowed_origins` en `config/cors.php` — si no, la API rechaza las peticiones del navegador.
+4. SSL con `certbot --nginx`.
