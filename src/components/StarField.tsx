@@ -1,5 +1,6 @@
-import { motion } from 'motion/react';
-import { EASE_CAMERA } from '../theme';
+import { useEffect, useRef } from 'react';
+import { createLiquidStarfield } from '../webgl/liquidStarfield';
+import type { LiquidStarfieldHandle } from '../webgl/liquidStarfield';
 
 interface StarFieldProps {
   camX: number;
@@ -9,33 +10,36 @@ interface StarFieldProps {
   flightDuration: number;
 }
 
-const LAYER_FACTORS = [0.03, 0.08, 0.16];
-
-/** Three parallax star layers; farther layers (lower factor) move less than the camera, giving depth. */
+/**
+ * WebGL-rendered parallax starfield with a cursor-reactive liquid ripple warp.
+ * Falls back to the plain dark background (already painted by the parent scene)
+ * if WebGL is unavailable — no crash, just no stars/ripple.
+ */
 export function StarField({ camX, camY, dimmed = false, flying, flightDuration }: StarFieldProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const handleRef = useRef<LiquidStarfieldHandle | null>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    handleRef.current = createLiquidStarfield(canvasRef.current);
+    return () => {
+      handleRef.current?.destroy();
+      handleRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    handleRef.current?.setCamera(camX, camY, flying, flightDuration);
+  }, [camX, camY, flying, flightDuration]);
+
+  useEffect(() => {
+    handleRef.current?.setDimmed(dimmed);
+  }, [dimmed]);
+
   return (
-    <>
-      {LAYER_FACTORS.map((factor, i) => {
-        const size = 70 - i * 10;
-        const baseOpacity = 0.09 + i * 0.06;
-        const opacity = dimmed ? baseOpacity * 0.2 : baseOpacity;
-        return (
-          <motion.div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: 4000,
-              height: 3000,
-              pointerEvents: 'none',
-              backgroundImage: `radial-gradient(circle, rgba(255,255,255,${opacity}) 1px, transparent 1.5px)`,
-              backgroundSize: `${size}px ${size}px`,
-              transition: 'background-image 0.6s ease',
-            }}
-            animate={{ left: -camX * factor - 1500, top: -camY * factor - 1000 }}
-            transition={flying ? { duration: flightDuration / 1000, ease: EASE_CAMERA } : { duration: 0 }}
-          />
-        );
-      })}
-    </>
+    <canvas
+      ref={canvasRef}
+      style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', display: 'block' }}
+    />
   );
 }

@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap');
 
+@property --pulse-amt {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -23,6 +29,16 @@ body {
 ::selection {
   background: #fff;
   color: #05060c;
+}
+
+@keyframes bodyPulse {
+  0%,
+  100% {
+    transform: scale(var(--pulse-base, 1));
+  }
+  50% {
+    transform: scale(calc(var(--pulse-base, 1) + var(--pulse-amt, 0)));
+  }
 }
 
 @keyframes fadein {

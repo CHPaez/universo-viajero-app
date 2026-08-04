@@ -1,7 +1,10 @@
 import { motion } from 'motion/react';
-import type { PointerEvent } from 'react';
+import { useRef } from 'react';
+import type { CSSProperties, PointerEvent } from 'react';
 import { EASE_CAMERA } from '../../theme';
 import type { PlanetView } from '../../hooks/useCamera';
+import { useCursorProximityGlow } from '../../hooks/useCursorProximity';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface PlanetProps {
   planet: PlanetView;
@@ -13,6 +16,13 @@ interface PlanetProps {
 export function Planet({ planet, flying, flightDuration, onDown }: PlanetProps) {
   const { data, x, y, scale, rotate, sysScale, opacity, blur, clickable, zIndex } = planet;
   const size = data.size;
+  const isMobile = useIsMobile();
+  const proximityRef = useRef<HTMLDivElement>(null);
+  const pulseScale = isMobile ? 0.6 : 1;
+  useCursorProximityGlow(proximityRef, isMobile ? size * 0.35 + 15 : size * 0.5 + 30, (closeness) => ({
+    pulseAmt: closeness * 0.035 * pulseScale,
+    boxShadow: `0 0 ${closeness * 16 * pulseScale}px ${closeness * 4 * pulseScale}px rgba(127,107,242,${closeness * 0.4})`,
+  }));
 
   return (
     <motion.div
@@ -42,45 +52,58 @@ export function Planet({ planet, flying, flightDuration, onDown }: PlanetProps) 
           filter: `blur(${4 + blur}px)`,
         }}
       />
-      <motion.div
-        animate={{ scale, rotate }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          position: 'relative',
-          width: size,
-          height: size,
-          borderRadius: '50%',
-          overflow: 'hidden',
-          boxShadow: `0 ${size * 0.08}px ${size * 0.25}px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06)`,
-        }}
+      <div
+        ref={proximityRef}
+        style={
+          {
+            '--pulse-base': 1,
+            '--pulse-amt': 0,
+            animation: 'bodyPulse 0.7s ease-in-out infinite',
+            borderRadius: '50%',
+            transition: 'box-shadow 0.6s ease-out, --pulse-amt 0.6s ease-out',
+          } as CSSProperties
+        }
       >
-        {data.src ? (
-          <img
-            src={data.src}
-            draggable={false}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : (
+        <motion.div
+          animate={{ scale, rotate }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position: 'relative',
+            width: size,
+            height: size,
+            borderRadius: '50%',
+            overflow: 'hidden',
+            boxShadow: `0 ${size * 0.08}px ${size * 0.25}px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06)`,
+          }}
+        >
+          {data.src ? (
+            <img
+              src={data.src}
+              draggable={false}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          ) : (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                background: 'repeating-linear-gradient(135deg,#2a2d36,#2a2d36 8px,#33373f 8px 16px)',
+              }}
+            />
+          )}
           <div
             style={{
               position: 'absolute',
               inset: 0,
               borderRadius: '50%',
-              background: 'repeating-linear-gradient(135deg,#2a2d36,#2a2d36 8px,#33373f 8px 16px)',
+              pointerEvents: 'none',
+              background:
+                'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.55), transparent 50%), radial-gradient(circle at 72% 78%, rgba(0,0,0,0.55), transparent 55%)',
             }}
           />
-        )}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '50%',
-            pointerEvents: 'none',
-            background:
-              'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.55), transparent 50%), radial-gradient(circle at 72% 78%, rgba(0,0,0,0.55), transparent 55%)',
-          }}
-        />
-      </motion.div>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
