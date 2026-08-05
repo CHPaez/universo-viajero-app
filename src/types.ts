@@ -14,6 +14,8 @@ export interface PlanetData {
   size: number;
   /** Image src, empty string for "aún por definir" placeholders. */
   src: string;
+  /** Optional video, only played once "arrived" (zoomed in) — null when none was uploaded. */
+  videoSrc: string | null;
   title: string;
   text: string;
   /** Per-planet audio, null when none was uploaded. */
@@ -22,6 +24,8 @@ export interface PlanetData {
 
 export interface SunData {
   src: string;
+  /** Optional video, only played while this sun is the near/prominent one — null when none was uploaded. */
+  videoSrc: string | null;
   bgPos: string;
   /** Inner halo color. */
   c1: string;

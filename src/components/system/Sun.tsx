@@ -14,7 +14,7 @@ interface SunProps {
 }
 
 export function Sun({ sun, flying, flightDuration, onDown }: SunProps) {
-  const { c1, c2, src, bgPos } = sun.sun;
+  const { c1, c2, src, videoSrc, bgPos } = sun.sun;
   const isMobile = useIsMobile();
   const proximityRef = useRef<HTMLDivElement>(null);
   const pulseScale = isMobile ? 0.6 : 1;
@@ -65,13 +65,26 @@ export function Sun({ sun, flying, flightDuration, onDown }: SunProps) {
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           style={{
+            position: 'relative',
             borderRadius: '50%',
+            overflow: 'hidden',
             backgroundImage: sun.showTexture && src ? `url(${src})` : 'none',
             backgroundSize: '105% 105%',
             backgroundPosition: bgPos,
             backgroundColor: sun.showTexture ? undefined : c1,
           }}
-        />
+        >
+          {sun.showTexture && videoSrc && (
+            <video
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          )}
+        </motion.div>
       </div>
     </motion.div>
   );

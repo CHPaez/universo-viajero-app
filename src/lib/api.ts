@@ -10,6 +10,7 @@ interface ApiPlanet {
   depth: number;
   size: number;
   src: string | null;
+  videoSrc: string | null;
   title: string;
   text: string | null;
   audioSrc: string | null;
@@ -19,7 +20,7 @@ interface ApiSystem {
   id: string;
   label: string;
   offsetX: number;
-  sun: { src: string | null; bgPos: string; c1: string; c2: string; audioSrc: string | null };
+  sun: { src: string | null; videoSrc: string | null; bgPos: string; c1: string; c2: string; audioSrc: string | null };
   planets: ApiPlanet[];
 }
 
@@ -42,7 +43,14 @@ export async function fetchSystems(): Promise<SystemsPayload> {
     id: s.id,
     label: s.label,
     offsetX: s.offsetX,
-    sun: { src: s.sun.src ?? '', bgPos: s.sun.bgPos, c1: s.sun.c1, c2: s.sun.c2, audioSrc: s.sun.audioSrc },
+    sun: {
+      src: s.sun.src ?? '',
+      videoSrc: s.sun.videoSrc,
+      bgPos: s.sun.bgPos,
+      c1: s.sun.c1,
+      c2: s.sun.c2,
+      audioSrc: s.sun.audioSrc,
+    },
     planets: s.planets.map((p) => ({
       id: p.id,
       yLane: p.yLane,
@@ -51,6 +59,7 @@ export async function fetchSystems(): Promise<SystemsPayload> {
       depth: p.depth,
       size: p.size,
       src: p.src ?? '',
+      videoSrc: p.videoSrc,
       title: p.title,
       text: p.text ?? '',
       audioSrc: p.audioSrc,

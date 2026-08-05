@@ -71,7 +71,16 @@ export function Planet({ planet, flying, flightDuration, onDown }: PlanetProps) 
             boxShadow: `0 ${size * 0.08}px ${size * 0.25}px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06)`,
           }}
         >
-          {data.src ? (
+          {planet.arrived && data.videoSrc ? (
+            <video
+              src={data.videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          ) : data.src ? (
             <img
               src={data.src}
               draggable={false}
