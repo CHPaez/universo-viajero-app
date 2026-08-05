@@ -15,7 +15,7 @@ interface SystemSceneProps {
 }
 
 export function SystemScene({ interactive }: SystemSceneProps) {
-  const { state, elapsed, systems, actions } = useUniverse();
+  const { state, elapsed, systems, player, actions } = useUniverse();
   const viewport = useViewportSize();
   const camera = useCamera(state, elapsed, viewport, systems);
 
@@ -90,6 +90,7 @@ export function SystemScene({ interactive }: SystemSceneProps) {
             flightDuration={state.flightDuration}
             onDown={(e) => {
               e.stopPropagation();
+              player.stopSun();
               if (sun.clickable) actions.goToSun(sun.systemIndex);
             }}
           />

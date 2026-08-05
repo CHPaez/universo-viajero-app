@@ -6,6 +6,7 @@ import type { AmbientTrackData, SolarSystemData } from '../types';
 const GENERAL_VOLUME = 0.35;
 const GENERAL_DUCKED_VOLUME = 0.08;
 const SUN_VOLUME = 0.55;
+const SUN_DUCKED_VOLUME = 0.12;
 const PLANET_VOLUME = 0.85;
 const FADE_MS = 700;
 
@@ -16,6 +17,7 @@ export interface AmbientPlayerControls {
   next: () => void;
   prev: () => void;
   togglePlay: () => void;
+  stopSun: () => void;
 }
 
 function fadeVolume(audio: HTMLAudioElement, target: number, ms: number) {
@@ -96,6 +98,7 @@ export function useAudioManager(
   const generalTracksRef = useRef(generalTracks);
   generalTracksRef.current = generalTracks;
   const duckedRef = useRef(false);
+  const sunSilencedSrc = useRef<string | null>(null);
 
   const next = useCallback(() => {
     setTrackIndex((i) => {
@@ -134,14 +137,17 @@ export function useAudioManager(
     if (planetSrc) {
       setOneShotEnded(false);
       planet.setSrc(planetSrc, PLANET_VOLUME);
-      sun.stop();
+      // Duck (don't stop) — stopping would reset playback position and replay the sun's
+      // one-shot from the start every time you look at a planet and come back.
+      sun.setVolume(SUN_DUCKED_VOLUME);
     } else {
       planet.stop();
-      if (sunSrc) {
+      if (sunSrc && sunSrc !== sunSilencedSrc.current) {
         setOneShotEnded(false);
         sun.setSrc(sunSrc, SUN_VOLUME);
-      } else {
+      } else if (!sunSrc) {
         sun.stop();
+        sunSilencedSrc.current = null;
       }
     }
 
@@ -199,6 +205,12 @@ export function useAudioManager(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const stopSun = useCallback(() => {
+    sunSilencedSrc.current = sun.ref.current?.src ?? null;
+    sun.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return {
     tracks: generalTracks,
     currentTrack: generalTracks[trackIndex] ?? null,
@@ -206,5 +218,6 @@ export function useAudioManager(
     next,
     prev,
     togglePlay,
+    stopSun,
   };
 }
