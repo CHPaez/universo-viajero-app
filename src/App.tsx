@@ -41,9 +41,11 @@ function Universe() {
             top: 'calc(50% + 26px)',
             left: '50%',
             transform: 'translateX(-50%)',
-            width: 90,
-            opacity: 0.45,
-            filter: 'url(#keyBlack) brightness(0.6) saturate(0.7) blur(0.5px)',
+            width: 110,
+            opacity: 0.9,
+            filter: 'url(#keyBlack)',
+            maskImage: 'radial-gradient(circle, black 42%, transparent 70%)',
+            WebkitMaskImage: 'radial-gradient(circle, black 42%, transparent 70%)',
           }}
         />
       </div>
