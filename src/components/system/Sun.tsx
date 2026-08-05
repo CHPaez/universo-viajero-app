@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
-import { useRef } from 'react';
-import type { PointerEvent } from 'react';
+import { useRef, useState } from 'react';
+import type { MouseEvent, PointerEvent } from 'react';
 import { EASE_CAMERA } from '../../theme';
 import type { SunView } from '../../hooks/useCamera';
 import { useCursorProximityGlow } from '../../hooks/useCursorProximity';
@@ -17,6 +17,12 @@ export function Sun({ sun, flying, flightDuration, onDown }: SunProps) {
   const { c1, c2, src, videoSrc, bgPos } = sun.sun;
   const isMobile = useIsMobile();
   const proximityRef = useRef<HTMLDivElement>(null);
+  const [videoMuted, setVideoMuted] = useState(true);
+
+  const toggleMute = (e: MouseEvent) => {
+    e.stopPropagation();
+    setVideoMuted((m) => !m);
+  };
   const pulseScale = isMobile ? 0.6 : 1;
   useCursorProximityGlow(
     proximityRef,
@@ -75,14 +81,39 @@ export function Sun({ sun, flying, flightDuration, onDown }: SunProps) {
           }}
         >
           {sun.showTexture && videoSrc && (
-            <video
-              src={videoSrc}
-              autoPlay
-              loop
-              muted
-              playsInline
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+            <>
+              <video
+                src={videoSrc}
+                autoPlay
+                loop
+                muted={videoMuted}
+                playsInline
+                onClick={toggleMute}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+              />
+              <button
+                onClick={toggleMute}
+                aria-label={videoMuted ? 'Activar sonido' : 'Silenciar'}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  bottom: 10,
+                  width: 26,
+                  height: 26,
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: 'rgba(0,0,0,0.5)',
+                  color: '#fff',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {videoMuted ? '🔇' : '🔊'}
+              </button>
+            </>
           )}
         </motion.div>
       </div>
