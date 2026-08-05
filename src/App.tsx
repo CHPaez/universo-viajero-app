@@ -42,8 +42,8 @@ function Universe() {
             left: '50%',
             transform: 'translateX(-50%)',
             width: 90,
-            opacity: 0.55,
-            filter: 'url(#keyBlack)',
+            opacity: 0.45,
+            filter: 'url(#keyBlack) brightness(0.6) saturate(0.7) blur(0.5px)',
           }}
         />
       </div>
