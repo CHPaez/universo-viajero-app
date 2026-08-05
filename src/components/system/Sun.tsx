@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useRef } from 'react';
-import type { CSSProperties, PointerEvent } from 'react';
+import type { PointerEvent } from 'react';
 import { EASE_CAMERA } from '../../theme';
 import type { SunView } from '../../hooks/useCamera';
 import { useCursorProximityGlow } from '../../hooks/useCursorProximity';
@@ -22,7 +22,7 @@ export function Sun({ sun, flying, flightDuration, onDown }: SunProps) {
     proximityRef,
     isMobile ? sun.dispSize * 0.25 + 20 : sun.dispSize * 0.35 + 40,
     (closeness) => ({
-      pulseAmt: closeness * 0.02 * pulseScale,
+      scale: 1 + closeness * 0.02 * pulseScale,
       boxShadow: `0 0 ${closeness * 20 * pulseScale}px ${closeness * 6 * pulseScale}px rgba(127,107,242,${closeness * 0.4})`,
     }),
   );
@@ -51,15 +51,10 @@ export function Sun({ sun, flying, flightDuration, onDown }: SunProps) {
     >
       <div
         ref={proximityRef}
-        style={
-          {
-            '--pulse-base': 1,
-            '--pulse-amt': 0,
-            animation: 'bodyPulse 0.8s ease-in-out infinite',
-            borderRadius: '50%',
-            transition: 'box-shadow 0.6s ease-out, --pulse-amt 0.6s ease-out',
-          } as CSSProperties
-        }
+        style={{
+          borderRadius: '50%',
+          transition: 'box-shadow 0.3s ease-out, transform 0.3s ease-out',
+        }}
       >
         <motion.div
           animate={{

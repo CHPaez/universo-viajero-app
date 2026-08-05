@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useRef } from 'react';
-import type { CSSProperties, PointerEvent } from 'react';
+import type { PointerEvent } from 'react';
 import { EASE_CAMERA } from '../../theme';
 import type { PlanetView } from '../../hooks/useCamera';
 import { useCursorProximityGlow } from '../../hooks/useCursorProximity';
@@ -20,7 +20,7 @@ export function Planet({ planet, flying, flightDuration, onDown }: PlanetProps) 
   const proximityRef = useRef<HTMLDivElement>(null);
   const pulseScale = isMobile ? 0.6 : 1;
   useCursorProximityGlow(proximityRef, isMobile ? size * 0.35 + 15 : size * 0.5 + 30, (closeness) => ({
-    pulseAmt: closeness * 0.035 * pulseScale,
+    scale: 1 + closeness * 0.04 * pulseScale,
     boxShadow: `0 0 ${closeness * 16 * pulseScale}px ${closeness * 4 * pulseScale}px rgba(127,107,242,${closeness * 0.4})`,
   }));
 
@@ -54,15 +54,10 @@ export function Planet({ planet, flying, flightDuration, onDown }: PlanetProps) 
       />
       <div
         ref={proximityRef}
-        style={
-          {
-            '--pulse-base': 1,
-            '--pulse-amt': 0,
-            animation: 'bodyPulse 0.7s ease-in-out infinite',
-            borderRadius: '50%',
-            transition: 'box-shadow 0.6s ease-out, --pulse-amt 0.6s ease-out',
-          } as CSSProperties
-        }
+        style={{
+          borderRadius: '50%',
+          transition: 'box-shadow 0.3s ease-out, transform 0.3s ease-out',
+        }}
       >
         <motion.div
           animate={{ scale, rotate }}
