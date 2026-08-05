@@ -160,10 +160,13 @@ export function useAudioManager(
   }, [oneShotEnded]);
 
   // Plays the selected playlist track (on unlock, on manual next/prev, or on auto-advance).
+  // With a single track, loop it natively — the "advance to next" path never fires
+  // because the index doesn't change, so a gapless native loop is what actually repeats it.
   useEffect(() => {
     if (!unlocked) return;
     const track = generalTracksRef.current[trackIndex];
     if (!track) return;
+    if (general.ref.current) general.ref.current.loop = generalTracksRef.current.length <= 1;
     general.setSrc(track.src, duckedRef.current ? GENERAL_DUCKED_VOLUME : GENERAL_VOLUME, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unlocked, trackIndex]);
